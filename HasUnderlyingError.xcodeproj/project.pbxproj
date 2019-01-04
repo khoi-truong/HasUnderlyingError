@@ -12,9 +12,11 @@
 		FF04B97021DDEF3C00EF1A13 /* HasUnderlyingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF04B96F21DDEF3C00EF1A13 /* HasUnderlyingError.swift */; };
 		FF04B97221DDEFD700EF1A13 /* ActionError+HasUnderlyingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF04B97121DDEFD700EF1A13 /* ActionError+HasUnderlyingError.swift */; };
 		FF04B97421DDF00D00EF1A13 /* Action+HasUnderlyingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF04B97321DDF00D00EF1A13 /* Action+HasUnderlyingError.swift */; };
+		FF04B97621DE214100EF1A13 /* ObservableType+HasUnderlyingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF04B97521DE214100EF1A13 /* ObservableType+HasUnderlyingError.swift */; };
 		FF4545D121DD19B800405CF9 /* HasUnderlyingError.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF4545C721DD19B800405CF9 /* HasUnderlyingError.framework */; };
 		FF4545D621DD19B800405CF9 /* HasUnderlyingErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4545D521DD19B800405CF9 /* HasUnderlyingErrorTests.swift */; };
 		FF4545D821DD19B800405CF9 /* HasUnderlyingError.h in Headers */ = {isa = PBXBuildFile; fileRef = FF4545CA21DD19B800405CF9 /* HasUnderlyingError.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFB447D821DF16F100860130 /* MoyaError+HasUnderlyingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB447D721DF16F100860130 /* MoyaError+HasUnderlyingError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,12 +39,14 @@
 		FF04B96F21DDEF3C00EF1A13 /* HasUnderlyingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasUnderlyingError.swift; sourceTree = "<group>"; };
 		FF04B97121DDEFD700EF1A13 /* ActionError+HasUnderlyingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionError+HasUnderlyingError.swift"; sourceTree = "<group>"; };
 		FF04B97321DDF00D00EF1A13 /* Action+HasUnderlyingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Action+HasUnderlyingError.swift"; sourceTree = "<group>"; };
+		FF04B97521DE214100EF1A13 /* ObservableType+HasUnderlyingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObservableType+HasUnderlyingError.swift"; sourceTree = "<group>"; };
 		FF4545C721DD19B800405CF9 /* HasUnderlyingError.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HasUnderlyingError.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF4545CA21DD19B800405CF9 /* HasUnderlyingError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HasUnderlyingError.h; sourceTree = "<group>"; };
 		FF4545CB21DD19B800405CF9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF4545D021DD19B800405CF9 /* HasUnderlyingErrorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HasUnderlyingErrorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF4545D521DD19B800405CF9 /* HasUnderlyingErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HasUnderlyingErrorTests.swift; sourceTree = "<group>"; };
 		FF4545D721DD19B800405CF9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FFB447D721DF16F100860130 /* MoyaError+HasUnderlyingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MoyaError+HasUnderlyingError.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,8 +94,10 @@
 			isa = PBXGroup;
 			children = (
 				FF04B96F21DDEF3C00EF1A13 /* HasUnderlyingError.swift */,
+				FF04B97521DE214100EF1A13 /* ObservableType+HasUnderlyingError.swift */,
 				FF04B97121DDEFD700EF1A13 /* ActionError+HasUnderlyingError.swift */,
 				FF04B97321DDF00D00EF1A13 /* Action+HasUnderlyingError.swift */,
+				FFB447D721DF16F100860130 /* MoyaError+HasUnderlyingError.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -297,6 +303,9 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HasUnderlyingErrorTests/Pods-HasUnderlyingErrorTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Action/Action.framework",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/Moya/Moya.framework",
+				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
 				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxOptional/RxOptional.framework",
@@ -310,6 +319,9 @@
 			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Action.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Moya.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxAtomic.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxOptional.framework",
@@ -332,7 +344,9 @@
 			files = (
 				FF04B97221DDEFD700EF1A13 /* ActionError+HasUnderlyingError.swift in Sources */,
 				FF04B97021DDEF3C00EF1A13 /* HasUnderlyingError.swift in Sources */,
+				FFB447D821DF16F100860130 /* MoyaError+HasUnderlyingError.swift in Sources */,
 				FF04B97421DDF00D00EF1A13 /* Action+HasUnderlyingError.swift in Sources */,
+				FF04B97621DE214100EF1A13 /* ObservableType+HasUnderlyingError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

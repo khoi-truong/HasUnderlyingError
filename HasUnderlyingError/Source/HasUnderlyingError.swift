@@ -7,51 +7,29 @@
 //
 
 import Foundation
-import RxSwift
-import RxOptional
 
 protocol HasUnderlyingError: Error {
     var underlyingError: Error? { get }
-    var underlyingErrorOrSelf: Error { get }
-    var deeplyUnderlyingError: Error? { get }
-    var deeplyUnderlyingErrorOrSelf: Error { get }
+    func orUnderlyingError() -> Error
+    var deepestUnderlyingError: Error? { get }
+    func orDeepestUnderlyingError() -> Error
 }
 
 extension HasUnderlyingError {
 
-    var underlyingErrorOrSelf: Error {
+   func orUnderlyingError() -> Error {
         guard let underlyingError = underlyingError else { return self }
         return underlyingError
     }
 
-    var deeplyUnderlyingError: Error? {
+    var deepestUnderlyingError: Error? {
         guard let underlyingError = underlyingError else { return nil }
         guard let wrapperError = underlyingError as? HasUnderlyingError else { return underlyingError }
-        return wrapperError.deeplyUnderlyingError
+        return wrapperError.deepestUnderlyingError
     }
 
-    var deeplyUnderlyingErrorOrSelf: Error {
-        guard let underlyingError = deeplyUnderlyingError else { return self }
+    func orDeepestUnderlyingError() -> Error {
+        guard let underlyingError = deepestUnderlyingError else { return self }
         return underlyingError
     }
 }
-
-extension ObservableType where E: HasUnderlyingError {
-
-    func getUnderlyingError() -> Observable<Error> {
-        return self.map { $0.underlyingError }.filterNil()
-    }
-
-    func getUnderlyingErrorOrSelf() -> Observable<Error> {
-        return self.map { $0.underlyingErrorOrSelf }
-    }
-
-    func getDeeplyUnderlyingError() -> Observable<Error> {
-        return self.map { $0.deeplyUnderlyingError }.filterNil()
-    }
-
-    func getDeeplyUnderlyingErrorOrSelf() -> Observable<Error> {
-        return self.map { $0.deeplyUnderlyingErrorOrSelf }
-    }
-}
-

@@ -12,9 +12,50 @@ import RxSwift
 import RxCocoa
 import RxTest
 import Action
+import Moya
 @testable import HasUnderlyingError
 
 class HasUnderlyingErrorSpec: QuickSpec {
+
+    override func spec() {
+
+        describe("Error with 2 level nested error") {
+            let topLevelError = TestUnderlyingError(input: "a")
+
+            it("should return a TestLevelOneUnderlyingError for underlyingError") {
+                expect(topLevelError.underlyingError).to(matchError(TestLevelOneUnderlyingError.self))
+            }
+            it("should return a TestLevelOneUnderlyingError for orUnderlyingError()") {
+                expect(topLevelError.orUnderlyingError()).to(matchError(TestLevelOneUnderlyingError.self))
+            }
+            it("should return a TestLevelTwoUnderlyingError for deepestUnderlyingError") {
+                expect(topLevelError.deepestUnderlyingError).to(matchError(TestLevelTwoUnderlyingError.self))
+            }
+            it("should return a TestLevelTwoUnderlyingError for orDeepestUnderlyingError()") {
+                expect(topLevelError.orDeepestUnderlyingError()).to(matchError(TestLevelTwoUnderlyingError.self))
+            }
+        }
+
+        describe("Error without any nested error") {
+            let error = TestLevelOneUnderlyingError.normal
+
+            it("should return nil for underlyingError") {
+                expect(error.underlyingError).to(beNil())
+            }
+            it("should return a TestLevelTwoUnderlyingError for deepestUnderlyingError") {
+                expect(error.deepestUnderlyingError).to(beNil())
+            }
+            it("should return itself for orUnderlyingError()") {
+                expect(error.orUnderlyingError()).to(matchError(TestLevelOneUnderlyingError.normal))
+            }
+            it("should return itself for orDeepestUnderlyingError()") {
+                expect(error.orDeepestUnderlyingError()).to(matchError(TestLevelOneUnderlyingError.normal))
+            }
+        }
+    }
+}
+
+class ActionHasUnderlyingErrorSpec: QuickSpec {
 
     override func spec() {
 
@@ -26,7 +67,7 @@ class HasUnderlyingErrorSpec: QuickSpec {
             let trigger = PublishRelay<Void>()
             let action = Action<String, String> { Observable.just($0).sample(trigger) }
             let underlyingError: TestableObserver<Error> = scheduler.createObserver(Error.self)
-            let deeplyUnderlyingError: TestableObserver<Error> = scheduler.createObserver(Error.self)
+            let deepestUnderlyingError: TestableObserver<Error> = scheduler.createObserver(Error.self)
 
             context("execute while executing") {
 
@@ -34,8 +75,8 @@ class HasUnderlyingErrorSpec: QuickSpec {
                     .bind(to: underlyingError)
                     .disposed(by: disposeBag)
 
-                action.deeplyUnderlyingError
-                    .bind(to: deeplyUnderlyingError)
+                action.deepestUnderlyingError
+                    .bind(to: deepestUnderlyingError)
                     .disposed(by: disposeBag)
 
                 scheduler.scheduleAt(10) {
@@ -55,8 +96,8 @@ class HasUnderlyingErrorSpec: QuickSpec {
                 it("should not emit any underlyingError") {
                     expect(underlyingError.events.count).to(equal(0))
                 }
-                it("should not emit any deeplyUnderlyingError") {
-                    expect(deeplyUnderlyingError.events.count).to(equal(0))
+                it("should not emit any deepestUnderlyingError") {
+                    expect(deepestUnderlyingError.events.count).to(equal(0))
                 }
             }
         }
@@ -69,7 +110,7 @@ class HasUnderlyingErrorSpec: QuickSpec {
             var trigger: PublishRelay<Void>!
             var action: Action<String, String>!
             var underlyingError: TestableObserver<Error>!
-            var deeplyUnderlyingError: TestableObserver<Error>!
+            var deepestUnderlyingError: TestableObserver<Error>!
 
             beforeEach {
                 scheduler = TestScheduler(initialClock: 0)
@@ -81,14 +122,14 @@ class HasUnderlyingErrorSpec: QuickSpec {
                     trigger.flatMapLatest { Observable<String>.error(TestUnderlyingError(input: input)) }
                 }
                 underlyingError = scheduler.createObserver(Error.self)
-                deeplyUnderlyingError = scheduler.createObserver(Error.self)
+                deepestUnderlyingError = scheduler.createObserver(Error.self)
 
                 action.underlyingError
                     .bind(to: underlyingError)
                     .disposed(by: disposeBag)
 
-                action.deeplyUnderlyingError
-                    .bind(to: deeplyUnderlyingError)
+                action.deepestUnderlyingError
+                    .bind(to: deepestUnderlyingError)
                     .disposed(by: disposeBag)
             }
 
@@ -113,10 +154,11 @@ class HasUnderlyingErrorSpec: QuickSpec {
                     expect(underlyingError.events.first?.value.element).to(matchError(TestUnderlyingError(input: "a")))
                 }
 
-                it("should emit only one deeplyUnderlyingError") {
-                    expect(deeplyUnderlyingError.events.count).to(equal(1))
-                    expect(deeplyUnderlyingError.events.first?.time).to(equal(30))
-                    expect(deeplyUnderlyingError.events.first?.value.element).to(matchError(TestDeeplyUnderlyingError(input: "a")))
+                it("should emit only one deepestUnderlyingError") {
+                    expect(deepestUnderlyingError.events.count).to(equal(1))
+                    expect(deepestUnderlyingError.events.first?.time).to(equal(30))
+                    expect(deepestUnderlyingError.events.first?.value.element)
+                        .to(matchError(TestLevelTwoUnderlyingError(input: "a")))
                 }
             }
 
@@ -145,11 +187,55 @@ class HasUnderlyingErrorSpec: QuickSpec {
                     expect(underlyingError.events.first?.value.element).to(matchError(TestUnderlyingError(input: "a")))
                 }
 
-                it("should emit only one deeplyUnderlyingError") {
-                    expect(deeplyUnderlyingError.events.count).to(equal(1))
-                    expect(deeplyUnderlyingError.events.first?.time).to(equal(30))
-                    expect(deeplyUnderlyingError.events.first?.value.element).to(matchError(TestDeeplyUnderlyingError(input: "a")))
+                it("should emit only one deepestUnderlyingError") {
+                    expect(deepestUnderlyingError.events.count).to(equal(1))
+                    expect(deepestUnderlyingError.events.first?.time).to(equal(30))
+                    expect(deepestUnderlyingError.events.first?.value.element)
+                        .to(matchError(TestLevelTwoUnderlyingError(input: "a")))
                 }
+            }
+        }
+    }
+}
+
+class MoyaErrorHasUnderlyingErrorSpec: QuickSpec {
+
+    override func spec() {
+
+        describe("MoyaError.underlying") {
+
+            let testUnderlyingError = TestUnderlyingError(input: "a")
+            let moyaError = MoyaError.underlying(testUnderlyingError, nil)
+
+            it("should return testUnderlyingError for underlyingError") {
+                expect(moyaError.underlyingError).to(matchError(testUnderlyingError))
+            }
+            it("should return TestLevelTwoUnderlyingError for deepestUnderlyingError") {
+                expect(moyaError.deepestUnderlyingError).to(matchError(TestLevelTwoUnderlyingError(input: "a")))
+            }
+            it("should return testUnderlyingError for orUnderlyingError()") {
+                expect(moyaError.orUnderlyingError()).to(matchError(testUnderlyingError))
+            }
+            it("should return TestLevelTwoUnderlyingError for orDeepestUnderlyingError()") {
+                expect(moyaError.orDeepestUnderlyingError()).to(matchError(TestLevelTwoUnderlyingError(input: "a")))
+            }
+        }
+
+        describe("MoyaError which is not underlying") {
+
+            let moyaError = MoyaError.requestMapping("test")
+
+            it("should return nil for underlyingError") {
+                expect(moyaError.underlyingError).to(beNil())
+            }
+            it("should return nil for deepestUnderlyingError") {
+                expect(moyaError.deepestUnderlyingError).to(beNil())
+            }
+            it("should return moyaError for orUnderlyingError()") {
+                expect(moyaError.orUnderlyingError()).to(matchError(moyaError))
+            }
+            it("should return moyaError for orDeepestUnderlyingError()") {
+                expect(moyaError.orDeepestUnderlyingError()).to(matchError(moyaError))
             }
         }
     }
@@ -158,11 +244,11 @@ class HasUnderlyingErrorSpec: QuickSpec {
 private struct TestUnderlyingError: Error, Equatable {
 
     let message: String
-    let error: TestDeeplyUnderlyingError
+    let error: TestLevelOneUnderlyingError
 
     init(input: String) {
         self.message = "Error \(input)"
-        self.error = TestDeeplyUnderlyingError(input: input)
+        self.error = .underlying(TestLevelTwoUnderlyingError(input: input))
     }
 }
 
@@ -173,7 +259,34 @@ extension TestUnderlyingError: HasUnderlyingError {
     }
 }
 
-private struct TestDeeplyUnderlyingError: Error, Equatable {
+private enum TestLevelOneUnderlyingError: Error {
+    case normal
+    case underlying(Error)
+}
+
+extension TestLevelOneUnderlyingError: HasUnderlyingError {
+
+    var underlyingError: Error? {
+        guard case .underlying(let error) = self else { return nil }
+        return error
+    }
+}
+
+extension TestLevelOneUnderlyingError: Equatable {
+
+    static func == (lhs: TestLevelOneUnderlyingError, rhs: TestLevelOneUnderlyingError) -> Bool {
+        switch (lhs, rhs) {
+        case (.normal, .normal):
+            return true
+        case (.normal, .underlying), (.underlying, .normal):
+            return false
+        case (.underlying(let lhsError), .underlying(let rhsError)):
+            return (lhsError as NSError) == (rhsError as NSError)
+        }
+    }
+}
+
+private struct TestLevelTwoUnderlyingError: Error, Equatable {
 
     let message: String
 

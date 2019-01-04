@@ -12,10 +12,10 @@ import Action
 extension Action {
 
     var underlyingError: Observable<Error> {
-        return self.errors.getUnderlyingError()
+        return self.errors.takeUnderlyingError()
     }
 
-    var deeplyUnderlyingError: Observable<Error> {
-        return self.errors.getDeeplyUnderlyingError()
+    var deepestUnderlyingError: Observable<Error> {
+        return self.errors.takeDeepestUnderlyingError()
     }
 }

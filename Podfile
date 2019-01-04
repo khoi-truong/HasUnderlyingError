@@ -7,16 +7,24 @@ def rx
   pod 'RxSwift'
   pod 'RxCocoa'
   pod 'RxOptional'
-  pod 'Action'
 end
 
 target 'HasUnderlyingError' do
+
   rx
+
+  pod 'Action'
+  pod 'Moya'
 end
 
 target 'HasUnderlyingErrorTests' do
   inherit! :search_paths
+
   rx
+
+  pod 'Action'
+  pod 'Moya'
+
   pod 'Quick'
   pod 'Nimble'
   pod 'RxTest'

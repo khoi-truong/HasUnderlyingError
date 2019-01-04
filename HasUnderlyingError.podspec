@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'HasUnderlyingError'
-  s.version          = '0.1.0'
+  s.version          = '0.2.0'
   s.summary          = 'Simple protocol to better deal with nesting errors.'
   s.description      = <<-DESC
 Simple protocol to better deal with nesting errors.
@@ -28,4 +28,5 @@ Simple protocol to better deal with nesting errors.
   s.dependency "RxCocoa"
   s.dependency "RxOptional"
   s.dependency "Action"
+  s.dependency "Moya"
 end
